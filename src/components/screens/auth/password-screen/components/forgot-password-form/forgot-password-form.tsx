@@ -11,6 +11,7 @@ interface ForgotPasswordProps {
 }
 
 export default function ForgotPassword({ setStep }: ForgotPasswordProps) {
+  const router = useRouter();
   const methods = useForm<ForgotPasswordData>({
     resolver: zodResolver(forgotPasswordSchema()),
     defaultValues: forgotPasswordDefaultValues,
@@ -30,7 +31,7 @@ export default function ForgotPassword({ setStep }: ForgotPasswordProps) {
         <div className="animate-in fade-in slide-in-from-right-4 duration-500 !space-y-4">
           <button
             type="button"
-            onClick={() => window.history.back()}
+            onClick={() => router.push("/login")}
             className="inline-flex items-center gap-2 text-sm text-[#f0f0ff]/40 hover:text-[#a78bfa] transition-colors mb-6"
           >
             <ArrowLeft className="w-4 h-4" /> Back to Sign in
