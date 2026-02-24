@@ -77,7 +77,7 @@ setStep
                   </div>
                   <h1 className="text-[26px] font-bold tracking-tight text-[#f0f0ff] mb-2">Check your email</h1>
                   <p className="text-sm text-[#f0f0ff]/50 leading-relaxed">
-                    We sent a code to <span className="text-[#a78bfa] font-medium">{email}</span>
+                    We sent a code to <span className="text-[#a78bfa] font-medium">{email || 'Your Email'}</span>
                   </p>
                 </div>
 
