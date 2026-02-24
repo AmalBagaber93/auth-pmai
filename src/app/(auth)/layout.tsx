@@ -9,7 +9,7 @@ export default async function Layout({ children }: { children: React.ReactNode }
   if (userDetailsData) {
     redirect('/dashboard');
   }
-  return { children };
+  return <>{children}</>;
 }
 
 
