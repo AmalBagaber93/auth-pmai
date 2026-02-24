@@ -23,7 +23,10 @@ export function useLoginMutation(
         router.push('/otp-verify');
         return;
       }
-
+      Cookies.set('token', response.data.token, {
+        expires: 7,
+        path: '/',
+      });
       toast.success(response.message || `Welcome back, ${response.data.user.name}!`);
       router.push('/dashboard');
     },

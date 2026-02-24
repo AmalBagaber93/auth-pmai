@@ -5,12 +5,13 @@ import { redirect } from "next/navigation";
 
 export default async function Layout({ children }: { children: React.ReactNode }) {
 
-    const userDetailsData =  getUserServer();
-    
-   if (!userDetailsData) {
-     redirect('/login');
-   }
+  const userDetailsData = await getUserServer();
 
+  if (!userDetailsData) {
+    console.log('no login')
+    redirect('/login');
+  }
+  console.log(userDetailsData)
   return <DashboardLayout>{children}</DashboardLayout>;
 }
 

@@ -1,6 +1,5 @@
 import ky, { BeforeRequestHook } from 'ky'
 import { cookies } from 'next/headers'
-import merge from 'lodash/merge';
 import { kyConfigs } from './config';
 
 const authInterceptor: BeforeRequestHook = async (request) => {
@@ -9,18 +8,13 @@ const authInterceptor: BeforeRequestHook = async (request) => {
     if (token) {
         request.headers.set('Authorization', `Bearer ${token}`)
     }
-      request.headers.set('Accept-Language', 'en');
+    request.headers.set('Accept-Language', 'en');
     request.headers.set('X-Locale', 'en')
-
 }
 
-export const apiServer = ky.create(
-    merge(JSON.parse(JSON.stringify(kyConfigs)), {
-        hooks: {
-            beforeRequest: [authInterceptor],
-        }
+export const apiServer = ky.create({
+    ...kyConfigs,
+    hooks: {
+        beforeRequest: [authInterceptor],
     }
-    )
-
-)
-
+})

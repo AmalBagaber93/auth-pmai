@@ -1,22 +1,20 @@
-import { apiClient } from "@/utils/fetch/api-client";
-import { apiServer } from "@/utils/fetch/api-server";
+import { cookies } from 'next/headers';
+import type { IGetUserResponse } from '../client/get-user';
+import { apiServer } from '@/utils/fetch/api-server';
 
+export async function getUserServer(): Promise<IGetUserResponse | null> {
+  const cookieStore = await cookies();
 
-export interface IUser {
-  id: number;
-  name: string;
-  email: string;
-  phone: string | null;
-  status: 'ACTIVE' | 'INACTIVE' | 'SUSPENDED';
-  roles: string[];
-  email_verified_at: string | null;
-}
+  const token = cookieStore.get('token')?.value;
 
-export interface IUserResponse {
-  data: IUser;
-}
+  if (!token) {
+    return null;
+  }
 
-export async function getUserServer(): Promise<IUserResponse> {
-    const getApiServer = await apiServer;
-    return getApiServer.get('user/me').json<IUserResponse>();
+  try {
+    return await apiServer.get('user/me').json<IGetUserResponse>();
+  } catch (error) {
+    console.error('getUserServer error:', error);
+    return null;
+  }
 }
