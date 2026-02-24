@@ -5,6 +5,7 @@ import { FormProvider, useForm } from "react-hook-form";
 import { ForgotPasswordData, forgotPasswordSchema } from "./schema/forgot-password-schema";
 import { forgotPasswordDefaultValues } from "./schema/forgot-password-default-values";
 import { useForgotPasswordMutation } from "@/api/auth/hooks/mutations/use-forgot-password.mutation";
+import { useRouter } from "next/navigation";
 
 interface ForgotPasswordProps {
   setStep: (step: "email" | "otp" | "reset-password" | "success") => void;
