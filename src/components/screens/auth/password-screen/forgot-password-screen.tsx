@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, Suspense } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import { cn } from "@/utils/utils";
 import { Background } from "@/components/common/background";
 import ForgotPassword from "./components/forgot-password-form/forgot-password-form";
@@ -10,8 +11,25 @@ import ResetPasswordScreen from "./components/reset-password/reset-password-scre
 
 type Step = "email" | "otp" | "reset-password" | "success";
 
-export default function ForgotPasswordScreen() {
-  const [step, setStep] = useState<Step>("email");
+function ForgotPasswordContent() {
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const stepFromQuery = searchParams.get("step") as Step;
+  
+  const [step, setStep] = useState<Step>(stepFromQuery || "email");
+
+  useEffect(() => {
+    if (stepFromQuery && ["email", "otp", "reset-password", "success"].includes(stepFromQuery)) {
+      setStep(stepFromQuery);
+    }
+  }, [stepFromQuery]);
+
+  const handleSetStep = (newStep: Step) => {
+    setStep(newStep);
+    const params = new URLSearchParams(window.location.search);
+    params.set("step", newStep);
+    router.push(`?${params.toString()}`);
+  };
 
   return (
     <div className="relative min-h-screen flex items-center justify-center p-6! bg-[#0a0a1a] overflow-hidden">
@@ -36,22 +54,30 @@ export default function ForgotPasswordScreen() {
         )}
 
         {step === "email" && (
-          <ForgotPassword setStep={setStep} />
+          <ForgotPassword setStep={handleSetStep} />
         )}
 
         {step === "otp" && (
-          <OtpVerifyForgotPasswordForm setStep={setStep} />
+          <OtpVerifyForgotPasswordForm setStep={handleSetStep} />
         )}
 
         {step === "reset-password" && (
-          <ResetPasswordScreen setStep={setStep} />
+          <ResetPasswordScreen setStep={handleSetStep} />
         )}
 
         {step === "success" && (
-          <EmailSenSuccess setStep={setStep} />
+          <EmailSenSuccess setStep={handleSetStep} />
         )}
 
       </main>
     </div>
+  );
+}
+
+export default function ForgotPasswordScreen() {
+  return (
+    <Suspense fallback={<div className="min-h-screen bg-[#0a0a1a]" />}>
+      <ForgotPasswordContent />
+    </Suspense>
   );
 }

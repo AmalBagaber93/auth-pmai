@@ -25,8 +25,8 @@ setStep
     defaultValues: otpForgotPasswordDefaultValues,
   });
 
-  const {mutate: verifyOtpMutation , isPending: isVerifying ,isSuccess} = useVerifyOtpMutation();
-  const {mutate: resendOtpMutation , isPending: isResending } = useResendOtpMutation();
+  const {mutate: verifyOtpMutation , isPending: isVerifying ,isSuccess: isVerifySuccess} = useVerifyOtpMutation();
+  const {mutate: resendOtpMutation , isPending: isResending , isSuccess: isResendSuccess } = useResendOtpMutation();
 
   const email = Cookies.get('auth_email');
   const vid = Cookies.get('auth_vid');
@@ -47,14 +47,14 @@ setStep
 
     resendOtpMutation({vid: vid || ""})
 
-    setResendCountdown(60);
+    isResendSuccess &&setResendCountdown(60);
 
   };
 
   const onSubmit = async (data: OtpForgotPasswordFormData) => {
 
     verifyOtpMutation({vid: vid || "",code:data.otp_code})
-    isSuccess && setStep("reset-password")
+    isVerifySuccess && setStep("reset-password")
     await new Promise((r) => setTimeout(r, 1400));
 
  
@@ -71,8 +71,8 @@ setStep
                 >
                   <ArrowLeft className="w-4 h-4" /> Back
                 </button>
-                <div className="text-center !mb-8">
-                  <div className="w-16 h-16 mx-auto !mt-6 bg-[#a78bfa]/10 rounded-full flex items-center justify-center border border-[#a78bfa]/20">
+                <div className="flex flex-col items-center text-center !mb-8">
+                  <div className="w-16 h-16 !mt-6 bg-[#a78bfa]/10 rounded-full flex items-center justify-center border border-[#a78bfa]/20">
                     <Mail className="w-8 h-8 text-[#a78bfa]" />
                   </div>
                   <h1 className="text-[26px] font-bold tracking-tight text-[#f0f0ff] mb-2">Check your email</h1>
