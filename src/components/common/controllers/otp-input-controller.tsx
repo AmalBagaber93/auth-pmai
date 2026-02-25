@@ -52,9 +52,11 @@ export function OtpInputController<TFormValues extends FieldValues>({
                                         key={index}
                                         index={index}
                                         className={cn(
-                                            "w-11 h-13 md:w-14 md:h-16 text-xl md:text-2xl font-bold rounded-xl border-white/10 bg-white/5 text-white transition-all duration-300",
-                                            "data-[active=true]:border-[#a78bfa] data-[active=true]:bg-[#a78bfa]/10 data-[active=true]:ring-0",
-                                            error && "border-destructive/50 bg-destructive/5"
+                                            "w-11 h-13 md:w-14 md:h-16 text-xl md:text-2xl font-bold rounded-xl",
+                                            "border border-white/10 bg-white/5 text-white transition-all duration-300",
+                                            "focus:outline-none focus:border-[#9f59c8] focus:ring-2 focus:ring-[#9f59c8]/30",
+                                            "data-[active=true]:border-[#7e59c8] data-[active=true]:bg-[#a78bfa]/10 data-[active=true]:ring-2 data-[active=true]:ring-[#9f59c8]/30",
+                                            error && "border-destructive/50 bg-destructive/5 ring-2 ring-destructive/20"
                                         )}
                                     />
                                 ))}

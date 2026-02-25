@@ -26,10 +26,10 @@ export default function LoginScreen() {
     setError
   } = methods;
 
-  const {mutate , isPending}= useLoginMutation(setError);
+  const { mutate, isPending } = useLoginMutation(setError);
 
   const onSubmit = (data: LoginFormData) => {
-mutate({...data , remember_me: data.remember_me ?? false})
+    mutate({ ...data, remember_me: data.remember_me ?? false })
 
   };
 
@@ -39,9 +39,9 @@ mutate({...data , remember_me: data.remember_me ?? false})
     <div className="relative min-h-screen flex items-center justify-center p-6 bg-[#0a0a1a] overflow-hidden">
       <Background />
 
-      <main className="relative z-10 w-full max-w-[440px] bg-white/[0.04] backdrop-blur-[24px] border border-white/10 rounded-[24px] !p-8 md:!p-12 shadow-[0_32px_80px_rgba(0,0,0,0.5)] animate-in fade-in slide-in-from-bottom-8 duration-700">
+      <main className="relative z-10 w-full max-w-110 bg-white/4 backdrop-blur-xl border border-white/10 rounded-3xl p-8! md:p-12! shadow-[0_32px_80px_rgba(0,0,0,0.5)] animate-in fade-in slide-in-from-bottom-8 duration-700">
         <div className="flex flex-col items-center gap-4 mb-10 text-center">
-          <span className="text-[22px] font-bold tracking-tight bg-gradient-to-br from-[#f0f0ff] to-[#a78bfa] bg-clip-text text-transparent">PMAI</span>
+          <span className="text-[22px] font-bold tracking-tight bg-linear-to-br from-[#f0f0ff] to-[#a78bfa] bg-clip-text text-transparent">PMAI</span>
         </div>
 
         <h1 className="text-[26px] font-bold tracking-tight text-[#f0f0ff] text-center mb-2">Welcome back</h1>
@@ -50,7 +50,7 @@ mutate({...data , remember_me: data.remember_me ?? false})
 
         <Form {...methods}>
           <form onSubmit={handleSubmit(onSubmit)} noValidate aria-label="Login form">
-            <div className="!space-y-6 !mt-4">
+            <div className="space-y-6! mt-4!">
               <InputController
                 name="email"
                 label="Email address"
@@ -81,7 +81,7 @@ mutate({...data , remember_me: data.remember_me ?? false})
                 type="submit"
                 id="login-submit-btn"
                 disabled={isPending}
-                className="w-full h-[52px] bg-gradient-to-r from-[#6c63ff] via-[#8b5cf6] to-[#a78bfa] rounded-xl text-white font-semibold flex items-center justify-center transition-all duration-300 hover:-translate-y-0.5 hover:shadow-[0_8px_36px_rgba(108,99,255,0.55)] active:translate-y-0 disabled:opacity-60 disabled:cursor-not-allowed shadow-[0_4px_24px_rgba(108,99,255,0.35)]"
+                className="w-full h-13 bg-linear-to-r from-[#6c63ff] via-[#8b5cf6] to-[#a78bfa] rounded-xl text-white font-semibold flex items-center justify-center transition-all duration-300 hover:-translate-y-0.5 hover:shadow-[0_8px_36px_rgba(108,99,255,0.55)] active:translate-y-0 disabled:opacity-60 disabled:cursor-not-allowed shadow-[0_4px_24px_rgba(108,99,255,0.35)]"
               >
                 {isPending ? (
                   <span className="flex items-center gap-2">
@@ -94,9 +94,9 @@ mutate({...data , remember_me: data.remember_me ?? false})
           </form>
         </Form>
 
-        <p className="text-center !mt-8 text-sm text-[#f0f0ff]/50">
+        <p className="text-center mt-8! text-sm text-[#f0f0ff]/50">
           Don&apos;t have an account?
-          <Link href="/register" className="text-[#a78bfa] font-bold !ml-1.5 hover:text-[#c4b5fd] transition-colors no-underline">
+          <Link href="/register" className="text-[#a78bfa] font-bold ml-1.5! hover:text-[#c4b5fd] transition-colors no-underline">
             Create one
           </Link>
         </p>

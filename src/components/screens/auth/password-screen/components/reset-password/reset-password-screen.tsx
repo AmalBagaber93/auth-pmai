@@ -24,7 +24,7 @@ export default function ResetPasswordScreen({ setStep }: ResetPasswordScreenProp
   });
   const { watch, setError, handleSubmit } = methods;
 
-  const { mutate: resetPasswordMutation, isPending: isSubmitting } = useResetPasswordMutation(setError);
+  const { mutateAsync: resetPasswordMutation, isPending: isSubmitting } = useResetPasswordMutation(setError);
 
   const password = watch("password");
 
@@ -43,7 +43,7 @@ export default function ResetPasswordScreen({ setStep }: ResetPasswordScreenProp
 
   const onSubmit = async (data: ResetPasswordData) => {
     await new Promise((r) => setTimeout(r, 1500));
-    resetPasswordMutation({ password: data.password, password_confirmation: data.password_confirmation, reset_token: resetToken });
+    await resetPasswordMutation({ password: data.password, password_confirmation: data.password_confirmation, reset_token: resetToken });
     setStep("success");
   };
 
@@ -51,13 +51,13 @@ export default function ResetPasswordScreen({ setStep }: ResetPasswordScreenProp
     <FormProvider {...methods}>
       <form onSubmit={handleSubmit(onSubmit)} >
         <div className="animate-in fade-in slide-in-from-right-4 duration-500">
-          <h1 className="text-[26px] font-bold tracking-tight text-[#f0f0ff] !mb-2 text-center">Set new password</h1>
-          <p className="text-sm text-[#f0f0ff]/50 leading-relaxed !mb-10 text-center">
+          <h1 className="text-[26px] font-bold tracking-tight text-[#f0f0ff] mb-2! text-center">Set new password</h1>
+          <p className="text-sm text-[#f0f0ff]/50 leading-relaxed mb-10! text-center">
             Create a strong and secure password that you haven&apos;t used before.
           </p>
 
-          <div className="!space-y-6">
-            <div className="!space-y-2">
+          <div className="space-y-6!">
+            <div className="space-y-2!">
               <PasswordFieldController
                 name="password"
                 label="New password"
@@ -66,7 +66,7 @@ export default function ResetPasswordScreen({ setStep }: ResetPasswordScreenProp
               />
 
               {password && (
-                <div className="border border-white/10 bg-white/[0.03] space-y-3 rounded-xl p-4 backdrop-blur-sm animate-in zoom-in duration-300">
+                <div className="border border-white/10 bg-white/3 space-y-3 rounded-xl p-4 backdrop-blur-sm animate-in zoom-in duration-300">
                   <p className="text-[#f0f0ff] text-[10px] font-bold uppercase tracking-wider opacity-50">
                     Password requirements
                   </p>

@@ -130,7 +130,7 @@ export default function RegisterScreen() {
           </form>
         </FormProvider>
 
-        {/* Login link */}
+
         <p className="text-center mt-8! text-sm text-[#f0f0ff]/50">
           Already have an account?
           <Link href="/login" className="text-[#a78bfa] font-bold ml-1.5 hover:text-[#c4b5fd] transition-colors no-underline">

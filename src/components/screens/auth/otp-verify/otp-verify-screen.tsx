@@ -24,8 +24,8 @@ export default function OtpVerifyScreen() {
     defaultValues: otpDefaultValues,
   });
 
-  const {mutate: verifyOtpMutation , isPending: isVerifying } = useVerifyOtpMutation();
-  const {mutate: resendOtpMutation , isPending: isResending } = useResendOtpMutation();
+  const { mutate: verifyOtpMutation, isPending: isVerifying } = useVerifyOtpMutation();
+  const { mutateAsync: resendOtpMutation, isPending: isResending } = useResendOtpMutation();
 
   const email = Cookies.get('auth_email');
   const vid = Cookies.get('auth_vid');
@@ -44,7 +44,7 @@ export default function OtpVerifyScreen() {
   const handleResend = async () => {
     if (resendCountdown > 0 || isResending) return;
 
-    resendOtpMutation({vid: vid || ""})
+    await resendOtpMutation({ vid: vid || "" })
 
     setResendCountdown(60);
 
@@ -52,11 +52,11 @@ export default function OtpVerifyScreen() {
 
   const onSubmit = async (data: OtpFormData) => {
 
-    verifyOtpMutation({vid: vid || "",code:data.otp_code})
-    
+    verifyOtpMutation({ vid: vid || "", code: data.otp_code })
+
     await new Promise((r) => setTimeout(r, 1400));
 
- 
+
   };
 
   return (
@@ -64,7 +64,7 @@ export default function OtpVerifyScreen() {
       <Background />
 
       <main className="relative z-10 w-full max-w-[440px] bg-white/[0.04] backdrop-blur-[24px] border border-white/10 rounded-[24px] !p-8 shadow-[0_32px_80px_rgba(0,0,0,0.5)] animate-in fade-in slide-in-from-bottom-8 duration-700">
-              <p className="text-start mt-10 text-sm">
+        <p className="text-start mt-10 text-sm">
           <Link href="/login" className="text-[#f0f0ff]/40 hover:text-[#a78bfa] transition-colors inline-flex items-center gap-2 group">
             <svg width="16" height="16" viewBox="0 0 16 16" fill="none" className="transition-transform group-hover:-translate-x-1">
               <path d="M10 12L6 8l4-4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
@@ -75,19 +75,19 @@ export default function OtpVerifyScreen() {
         <div className="flex flex-col items-center !gap-4 !mb-10 text-center">
 
           <span className="text-[22px] font-bold tracking-tight bg-gradient-to-br from-[#f0f0ff] to-[#a78bfa] bg-clip-text text-transparent">PMAI</span>
-                  <div className="text-center ">
-          <div className="w-20 h-20 mx-auto mb-6 bg-gradient-to-br from-[#6c63ff]/10 to-[#a78bfa]/10 rounded-full flex items-center justify-center border border-white/5 shadow-2xl">
-            <svg width="36" height="36" viewBox="0 0 36 36" fill="none">
-              <rect x="4" y="8" width="28" height="20" rx="3" stroke="#a78bfa" strokeWidth="1.8" />
-              <path d="M4 12l14 9 14-9" stroke="#a78bfa" strokeWidth="1.8" strokeLinecap="round" />
-            </svg>
+          <div className="text-center ">
+            <div className="w-20 h-20 mx-auto mb-6 bg-gradient-to-br from-[#6c63ff]/10 to-[#a78bfa]/10 rounded-full flex items-center justify-center border border-white/5 shadow-2xl">
+              <svg width="36" height="36" viewBox="0 0 36 36" fill="none">
+                <rect x="4" y="8" width="28" height="20" rx="3" stroke="#a78bfa" strokeWidth="1.8" />
+                <path d="M4 12l14 9 14-9" stroke="#a78bfa" strokeWidth="1.8" strokeLinecap="round" />
+              </svg>
+            </div>
+            <h1 className="text-[26px] font-bold tracking-tight text-[#f0f0ff] mb-2">Verify your email</h1>
+            <p className="text-sm text-[#f0f0ff]/50 leading-relaxed">
+              We sent a 6-digit code to <br />
+              <span className="text-[#a78bfa] font-semibold"> {email || "Your Email"}</span>
+            </p>
           </div>
-          <h1 className="text-[26px] font-bold tracking-tight text-[#f0f0ff] mb-2">Verify your email</h1>
-          <p className="text-sm text-[#f0f0ff]/50 leading-relaxed">
-            We sent a 6-digit code to <br />
-            <span className="text-[#a78bfa] font-semibold"> {email || "Your Email"}</span>
-          </p>
-        </div>
         </div>
 
 
@@ -107,7 +107,7 @@ export default function OtpVerifyScreen() {
               disabled={isVerifying}
               className={cn(
                 "w-full h-12 rounded-xl font-semibold text-white transition-all duration-300",
-                "bg-gradient-to-r from-[#6366f1] to-[#a855f7] hover:from-[#585ce5] hover:to-[#9333ea]",
+                "bg-linear-to-r from-[#6366f1] to-[#a855f7] hover:from-[#585ce5] hover:to-[#9333ea]",
                 "shadow-[0_8px_20px_-4px_rgba(99,102,241,0.4)] hover:shadow-[0_12px_25px_-4px_rgba(99,102,241,0.5)]",
                 "active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed",
                 "flex items-center justify-center gap-2"

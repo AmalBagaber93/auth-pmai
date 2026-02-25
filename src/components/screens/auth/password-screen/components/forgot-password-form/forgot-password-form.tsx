@@ -18,7 +18,7 @@ export default function ForgotPassword({ setStep }: ForgotPasswordProps) {
     defaultValues: forgotPasswordDefaultValues,
   });
 
-  const { mutate: forgotPassword } = useForgotPasswordMutation();
+  const { mutate: forgotPassword, isPending } = useForgotPasswordMutation();
   const { handleSubmit } = methods;
 
   const onSubmit = async (data: ForgotPasswordData) => {
@@ -29,7 +29,7 @@ export default function ForgotPassword({ setStep }: ForgotPasswordProps) {
   return (
     <FormProvider {...methods}>
       <form onSubmit={handleSubmit(onSubmit)} >
-        <div className="animate-in fade-in slide-in-from-right-4 duration-500 !space-y-4">
+        <div className="animate-in fade-in slide-in-from-right-4 duration-500 space-y-4!">
           <button
             type="button"
             onClick={() => router.push("/login")}
@@ -52,7 +52,7 @@ export default function ForgotPassword({ setStep }: ForgotPasswordProps) {
               type="submit"
               className="w-full h-13 mt-6! bg-linear-to-r from-[#6c63ff] via-[#8b5cf6] to-[#a78bfa] rounded-xl text-white font-semibold flex items-center justify-center transition-all hover:-translate-y-0.5 hover:shadow-[0_8px_36px_rgba(108,99,255,0.55)] active:translate-y-0 shadow-[0_4px_24px_rgba(108,99,255,0.35)]"
             >
-              Send reset code
+              {isPending ? "Sending" : "Send reset code"}
             </button>
           </div>
         </div>
