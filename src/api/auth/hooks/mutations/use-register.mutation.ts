@@ -14,10 +14,12 @@ export const useRegisterMutation = ({ setError }: UseRegisterMutationProps) => {
   return useMutation({
     onSuccess: async (response, variables) => {
       toast.success(response.data.message || 'A verification code has been sent to your email');
-      router.push('/otp-verify');
+
 
       Cookies.set('auth_email', variables.email)
       Cookies.set('auth_vid', response.data.vid)
+
+      router.push('/otp-verify');
 
     },
     onError: (error: any) => {

@@ -11,8 +11,9 @@ import { Form } from "@/components/ui/form";
 import { Background } from "@/components/common/background";
 import { OtpInputController } from "@/components/common/controllers/otp-input-controller";
 import { useResendOtpMutation } from "@/api/auth/hooks/mutations/use-resend-otp.mutation";
-import { useVerifyOtpMutation } from "@/api/auth/hooks/mutations/use-verify-otp";
 import Cookies from "js-cookie"
+import { Mail } from "lucide-react";
+import { useVerifyOtpMutation } from "@/api/auth/hooks/mutations/use-verify-otp.mutation";
 
 
 
@@ -72,22 +73,30 @@ export default function OtpVerifyScreen() {
             Back to Sign in
           </Link>
         </p>
-        <div className="flex flex-col items-center !gap-4 !mb-10 text-center">
+        <div className="flex flex-col items-center gap-4 mb-10! text-center">
 
-          <span className="text-[22px] font-bold tracking-tight bg-gradient-to-br from-[#f0f0ff] to-[#a78bfa] bg-clip-text text-transparent">PMAI</span>
-          <div className="text-center ">
-            <div className="w-20 h-20 mx-auto mb-6 bg-gradient-to-br from-[#6c63ff]/10 to-[#a78bfa]/10 rounded-full flex items-center justify-center border border-white/5 shadow-2xl">
-              <svg width="36" height="36" viewBox="0 0 36 36" fill="none">
-                <rect x="4" y="8" width="28" height="20" rx="3" stroke="#a78bfa" strokeWidth="1.8" />
-                <path d="M4 12l14 9 14-9" stroke="#a78bfa" strokeWidth="1.8" strokeLinecap="round" />
-              </svg>
+          <span className="text-[22px] font-bold tracking-tight bg-gradient-to-br from-[#f0f0ff] to-[#a78bfa] bg-clip-text text-transparent">
+            PMAI
+          </span>
+
+          <div className="flex flex-col items-center gap-3">
+            <div className="w-16 h-16 bg-[#a78bfa]/10 rounded-full flex items-center justify-center border border-[#a78bfa]/20 shadow-[0_0_24px_#a78bfa20]">
+              <Mail className="w-8 h-8 text-[#a78bfa]" />
             </div>
-            <h1 className="text-[26px] font-bold tracking-tight text-[#f0f0ff] mb-2">Verify your email</h1>
-            <p className="text-sm text-[#f0f0ff]/50 leading-relaxed">
-              We sent a 6-digit code to <br />
-              <span className="text-[#a78bfa] font-semibold"> {email || "Your Email"}</span>
-            </p>
+
+            <div className="flex flex-col gap-1">
+              <h1 className="text-[26px] font-bold tracking-tight text-[#f0f0ff]">
+                Verify your email
+              </h1>
+              <p className="text-sm text-[#f0f0ff]/50 leading-relaxed">
+                We sent a 6-digit code to{" "}
+                <span className="text-[#a78bfa] font-semibold">
+                  {email || "Your Email"}
+                </span>
+              </p>
+            </div>
           </div>
+
         </div>
 
 

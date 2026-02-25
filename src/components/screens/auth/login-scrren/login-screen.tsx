@@ -11,6 +11,7 @@ import { CheckboxFieldController } from "@/components/common/controllers/checkbo
 import { Form } from "@/components/ui/form";
 import { Background } from "@/components/common/background";
 import { useLoginMutation } from "@/api/auth/hooks/mutations/use-login.mutation";
+import { useRecoverVerification } from "@/api/auth/hooks/mutations/use-recover-verification.mutation";
 
 
 export default function LoginScreen() {
@@ -26,10 +27,15 @@ export default function LoginScreen() {
     setError
   } = methods;
 
-  const { mutate, isPending } = useLoginMutation(setError);
+  const { mutate: verifyEmailMutate } = useRecoverVerification()
+
+  const onVerifyEmail = () => {
+    verifyEmailMutate({ email: methods.getValues("email") })
+  }
+  const { mutate: loginMutate, isPending } = useLoginMutation(setError, onVerifyEmail);
 
   const onSubmit = (data: LoginFormData) => {
-    mutate({ ...data, remember_me: data.remember_me ?? false })
+    loginMutate({ ...data, remember_me: data.remember_me ?? false })
 
   };
 

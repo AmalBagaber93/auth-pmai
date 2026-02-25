@@ -9,6 +9,7 @@ import Cookies from 'js-cookie';
 
 export function useLoginMutation(
   setError: UseFormSetError<any>,
+  onVerifyEmail: () => void
 ) {
   const router = useRouter();
 
@@ -20,7 +21,7 @@ export function useLoginMutation(
       if (response.data.action_required === 'verify_email') {
         toast.success(response.message || 'Please verify your email address');
         Cookies.set('auth_email', variables.email);
-        router.push('/otp-verify');
+        onVerifyEmail()
         return;
       }
       Cookies.set('token', response.data.token, {
@@ -30,7 +31,7 @@ export function useLoginMutation(
       toast.success(response.message || `Welcome back, ${response.data.user.name}!`);
       router.push('/dashboard');
     },
-    onError: async (error: any, variables) => {
+    onError: async (error: any) => {
       try {
         const data = JSON.parse(error.message);
 
