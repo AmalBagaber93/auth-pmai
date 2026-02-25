@@ -9,7 +9,8 @@ import { PasswordFieldController } from "@/components/common/controllers/passwor
 import { resetPasswordSchema, type ResetPasswordData } from "./schema/reset-password-schema";
 import { resetPasswordDefaultValues } from "./schema/reset-password-default-values";
 import { useResetPasswordMutation } from "@/api/auth/hooks/mutations/use-reset-password.mutation";
-import { useSearchParams } from "next/navigation";
+import Cookies from "js-cookie"
+import Link from "next/link";
 
 interface ResetPasswordScreenProps {
   setStep: (step: "success" | "reset-password") => void;
@@ -28,9 +29,7 @@ export default function ResetPasswordScreen({ setStep }: ResetPasswordScreenProp
 
   const password = watch("password");
 
-  const searchParams = useSearchParams();
-
-  const resetToken = searchParams.get('reset_token') || '';
+  const resetToken = Cookies.get('reset_token');
 
   const passwordChecks = useMemo(() => {
     return {
@@ -66,11 +65,11 @@ export default function ResetPasswordScreen({ setStep }: ResetPasswordScreenProp
               />
 
               {password && (
-                <div className="border border-white/10 bg-white/3 space-y-3 rounded-xl p-4 backdrop-blur-sm animate-in zoom-in duration-300">
+                <div className="border border-white/10 bg-white/3 !space-y-3 rounded-xl !p-2 backdrop-blur-sm animate-in zoom-in duration-300">
                   <p className="text-[#f0f0ff] text-[10px] font-bold uppercase tracking-wider opacity-50">
                     Password requirements
                   </p>
-                  <ul className="space-y-2">
+                  <ul className="!space-y-2">
                     {[
                       { key: 'minLength', label: '8+ characters', check: passwordChecks.minLength },
                       { key: 'hasNumber', label: 'One number', check: passwordChecks.hasNumber },
@@ -113,6 +112,12 @@ export default function ResetPasswordScreen({ setStep }: ResetPasswordScreenProp
                 </span>
               ) : "Reset password"}
             </button>
+            <p className="text-center mt-8! text-sm text-[#f0f0ff]/50">
+              go to
+              <Link href="/login" className="text-[#a78bfa] font-bold ml-1.5! hover:text-[#c4b5fd] transition-colors no-underline">
+                Sign In
+              </Link>
+            </p>
           </div>
         </div>
       </form>

@@ -28,8 +28,9 @@ export function useLoginMutation(
         expires: 7,
         path: '/',
       });
-      toast.success(response.message || `Welcome back, ${response.data.user.name}!`);
       router.push('/dashboard');
+      toast.success(response.message || `Welcome back, ${response.data.user.name}!`);
+
     },
     onError: async (error: any) => {
       try {
