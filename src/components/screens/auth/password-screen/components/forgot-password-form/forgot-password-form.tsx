@@ -8,6 +8,8 @@ import { useForgotPasswordMutation } from "@/api/auth/hooks/mutations/use-forgot
 import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 
+import { startTimers } from "@/utils/timer-utils";
+
 interface ForgotPasswordProps {
   setStep: (step: "email" | "otp" | "reset-password" | "success") => void;
 }
@@ -24,8 +26,12 @@ export default function ForgotPassword({ setStep }: ForgotPasswordProps) {
   const { handleSubmit } = methods;
 
   const onSubmit = async (data: ForgotPasswordData) => {
-    forgotPassword(data);
-    setStep("otp");
+    forgotPassword(data, {
+      onSuccess: () => {
+        startTimers();
+        setStep("otp");
+      }
+    });
   };
 
   return (
@@ -41,7 +47,7 @@ export default function ForgotPassword({ setStep }: ForgotPasswordProps) {
             onClick={() => router.push("/login")}
             className="inline-flex items-center gap-2 text-sm text-white/40 hover:text-white transition-colors self-start"
           >
-            <ChevronLeft className="w-4 h-4 flex-shrink-0 transition-transform group-hover:-translate-x-1" />
+            <ChevronLeft className="w-4 h-4 shrink-0 transition-transform group-hover:-translate-x-1" />
             <span>Back to Sign in</span>
           </button>
 
@@ -65,7 +71,7 @@ export default function ForgotPassword({ setStep }: ForgotPasswordProps) {
               whileTap={{ scale: 0.99 }}
               type="submit"
               disabled={isPending}
-              className="w-full h-13 bg-gradient-to-r from-indigo-600 to-indigo-500 rounded-2xl text-white font-bold text-sm flex items-center justify-center transition-all duration-300 shadow-[0_12px_24px_-8px_rgba(79,70,229,0.5)] hover:shadow-[0_20px_40px_-8px_rgba(79,70,229,0.7)] disabled:opacity-50 disabled:cursor-not-allowed uppercase tracking-wider"
+              className="w-full h-13 bg-linear-to-r from-indigo-600 to-indigo-500 rounded-2xl text-white font-bold text-sm flex items-center justify-center transition-all duration-300 shadow-[0_12px_24px_-8px_rgba(79,70,229,0.5)] hover:shadow-[0_20px_40px_-8px_rgba(79,70,229,0.7)] disabled:opacity-50 disabled:cursor-not-allowed uppercase tracking-wider"
             >
               {isPending ? (
                 <span className="flex items-center gap-2">

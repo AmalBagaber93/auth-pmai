@@ -11,6 +11,16 @@ import { ChevronLeft, Mail } from "lucide-react";
 import { useVerifyForgotPasswordOtpMutation } from "@/api/auth/hooks/mutations/use-verify-forgot-password-otp.mutation";
 import { useResendForgotPasswordOtpMutation } from "@/api/auth/hooks/mutations/use-resend-forgot-password-otp.mutation";
 import { motion, AnimatePresence } from "framer-motion";
+import { 
+  getRemaining, 
+  startTimers, 
+  clearTimers, 
+  ensureTimersStarted,
+  RESEND_KEY, 
+  RESEND_DURATION, 
+  EXPIRY_DURATION, 
+  EXPIRY_KEY 
+} from "@/utils/timer-utils";
 
 interface OtpVerifyForgotPasswordFormProps {
   setStep: (step: "email" | "otp" | "reset-password" | "success") => void;
@@ -19,8 +29,9 @@ interface OtpVerifyForgotPasswordFormProps {
 export default function OtpVerifyForgotPasswordForm({
   setStep
 }: OtpVerifyForgotPasswordFormProps) {
-  const [resendCountdown, setResendCountdown] = useState(60);
-  const [expiryCountdown, setExpiryCountdown] = useState(600);
+  const [resendCountdown, setResendCountdown] = useState(() => getRemaining(RESEND_KEY, RESEND_DURATION));
+  const [expiryCountdown, setExpiryCountdown] = useState(() => getRemaining(EXPIRY_KEY, EXPIRY_DURATION));
+
 
   const methods = useForm<OtpForgotPasswordFormData>({
     resolver: zodResolver(otpForgotPasswordFormSchema()),
@@ -34,6 +45,10 @@ export default function OtpVerifyForgotPasswordForm({
   const vid = Cookies.get('auth_vid');
 
   const { handleSubmit } = methods;
+
+  useEffect(() => {
+    ensureTimersStarted();
+  }, []);
 
   useEffect(() => {
     if (resendCountdown <= 0) return;
@@ -56,12 +71,14 @@ export default function OtpVerifyForgotPasswordForm({
   const handleResend = async () => {
     if (resendCountdown > 0 || isResending) return;
     await resendOtpMutation({ vid: vid || "" });
-    setResendCountdown(60);
-    setExpiryCountdown(600);
+    startTimers();
+    setResendCountdown(RESEND_DURATION);
+    setExpiryCountdown(EXPIRY_DURATION);
   };
 
   const onSubmit = async (data: OtpForgotPasswordFormData) => {
     await verifyOtpMutation({ vid: vid || "", code: data.otp_code });
+    clearTimers()
     setStep("reset-password");
   };
 
@@ -131,7 +148,7 @@ export default function OtpVerifyForgotPasswordForm({
                 whileTap={{ scale: 0.99 }}
                 type="submit"
                 disabled={isVerifying || expiryCountdown === 0}
-                className="w-full h-13 bg-gradient-to-r from-indigo-600 to-indigo-500 rounded-2xl text-white font-bold text-sm flex items-center justify-center transition-all duration-300 shadow-[0_12px_24px_-8px_rgba(79,70,229,0.5)] hover:shadow-[0_20px_40px_-8px_rgba(79,70,229,0.7)] disabled:opacity-50 disabled:cursor-not-allowed uppercase tracking-wider"
+                className="w-full h-13 bg-linear-to-r from-indigo-600 to-indigo-500 rounded-2xl text-white font-bold text-sm flex items-center justify-center transition-all duration-300 shadow-[0_12px_24px_-8px_rgba(79,70,229,0.5)] hover:shadow-[0_20px_40px_-8px_rgba(79,70,229,0.7)] disabled:opacity-50 disabled:cursor-not-allowed uppercase tracking-wider"
               >
                 {isVerifying ? (
                   <span className="flex items-center gap-2">

@@ -16,13 +16,22 @@ import { motion } from "framer-motion";
 
 import AuthCard from "../components/auth-card";
 import { useRouter } from "next/navigation";
+import { 
+  getRemaining, 
+  startTimers, 
+  ensureTimersStarted, 
+  RESEND_KEY, 
+  RESEND_DURATION, 
+  EXPIRY_KEY, 
+  EXPIRY_DURATION 
+} from "@/utils/timer-utils";
 
 export default function OtpVerifyScreen() {
   const router = useRouter();
 
   const [isChecking, setIsChecking] = useState(true);
-  const [resendCountdown, setResendCountdown] = useState(60);
-  const [expiryCountdown, setExpiryCountdown] = useState(600);
+  const [resendCountdown, setResendCountdown] = useState(() => getRemaining(RESEND_KEY, RESEND_DURATION));
+  const [expiryCountdown, setExpiryCountdown] = useState(() => getRemaining(EXPIRY_KEY, EXPIRY_DURATION));
 
   const form = useForm<OtpFormData>({
     resolver: zodResolver(otpFormSchema()),
@@ -37,6 +46,9 @@ export default function OtpVerifyScreen() {
 
   const { handleSubmit } = form;
 
+  useEffect(() => {
+    ensureTimersStarted();
+  }, []);
 
   useEffect(() => {
     if (!vid) {
@@ -67,8 +79,9 @@ export default function OtpVerifyScreen() {
   const handleResend = async () => {
     if (resendCountdown > 0 || isResending) return;
     await resendOtpMutation({ vid: vid || "" });
-    setResendCountdown(60);
-    setExpiryCountdown(600);
+    startTimers();
+    setResendCountdown(RESEND_DURATION);
+    setExpiryCountdown(EXPIRY_DURATION);
   };
 
   const onSubmit = async (data: OtpFormData) => {

@@ -6,7 +6,7 @@ export interface IUser {
   name: string;
   email: string;
   phone: string | null;
-  status: 'ACTIVE' | 'INACTIVE' | 'SUSPENDED';
+  status: string;
   roles: string[];
   email_verified_at: string | null;
 }
