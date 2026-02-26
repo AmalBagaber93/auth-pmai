@@ -5,6 +5,8 @@ import { FieldValues, UseFormSetError } from "react-hook-form";
 import { useRouter } from "next/navigation";
 import Cookies from "js-cookie";
 
+import { startTimers } from '@/utils/timer-utils';
+
 type UseRegisterMutationProps<T extends FieldValues = any> = {
   setError: UseFormSetError<T>;
 };
@@ -19,6 +21,7 @@ export const useRegisterMutation = ({ setError }: UseRegisterMutationProps) => {
       Cookies.set('auth_email', variables.email)
       Cookies.set('auth_vid', response.data.vid, { expires: 1 / 24 })
 
+      startTimers();
       router.push('/otp-verify');
 
     },

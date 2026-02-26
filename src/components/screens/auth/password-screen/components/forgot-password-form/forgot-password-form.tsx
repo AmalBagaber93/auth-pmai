@@ -8,7 +8,7 @@ import { useForgotPasswordMutation } from "@/api/auth/hooks/mutations/use-forgot
 import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 
-import { startTimers } from "@/utils/timer-utils";
+import { startTimers, FORGOT_PASSWORD_RESEND_KEY, FORGOT_PASSWORD_EXPIRY_KEY } from "@/utils/timer-utils";
 
 interface ForgotPasswordProps {
   setStep: (step: "email" | "otp" | "reset-password" | "success") => void;
@@ -28,7 +28,7 @@ export default function ForgotPassword({ setStep }: ForgotPasswordProps) {
   const onSubmit = async (data: ForgotPasswordData) => {
     forgotPassword(data, {
       onSuccess: () => {
-        startTimers();
+        startTimers(FORGOT_PASSWORD_RESEND_KEY, FORGOT_PASSWORD_EXPIRY_KEY);
         setStep("otp");
       }
     });

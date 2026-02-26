@@ -16,10 +16,10 @@ import {
   startTimers, 
   clearTimers, 
   ensureTimersStarted,
-  RESEND_KEY, 
   RESEND_DURATION, 
   EXPIRY_DURATION, 
-  EXPIRY_KEY 
+  FORGOT_PASSWORD_RESEND_KEY,
+  FORGOT_PASSWORD_EXPIRY_KEY
 } from "@/utils/timer-utils";
 
 interface OtpVerifyForgotPasswordFormProps {
@@ -29,8 +29,8 @@ interface OtpVerifyForgotPasswordFormProps {
 export default function OtpVerifyForgotPasswordForm({
   setStep
 }: OtpVerifyForgotPasswordFormProps) {
-  const [resendCountdown, setResendCountdown] = useState(() => getRemaining(RESEND_KEY, RESEND_DURATION));
-  const [expiryCountdown, setExpiryCountdown] = useState(() => getRemaining(EXPIRY_KEY, EXPIRY_DURATION));
+  const [resendCountdown, setResendCountdown] = useState(() => getRemaining(FORGOT_PASSWORD_RESEND_KEY, RESEND_DURATION));
+  const [expiryCountdown, setExpiryCountdown] = useState(() => getRemaining(FORGOT_PASSWORD_EXPIRY_KEY, EXPIRY_DURATION));
 
 
   const methods = useForm<OtpForgotPasswordFormData>({
@@ -47,7 +47,7 @@ export default function OtpVerifyForgotPasswordForm({
   const { handleSubmit } = methods;
 
   useEffect(() => {
-    ensureTimersStarted();
+    ensureTimersStarted(FORGOT_PASSWORD_RESEND_KEY, FORGOT_PASSWORD_EXPIRY_KEY);
   }, []);
 
   useEffect(() => {
@@ -71,14 +71,14 @@ export default function OtpVerifyForgotPasswordForm({
   const handleResend = async () => {
     if (resendCountdown > 0 || isResending) return;
     await resendOtpMutation({ vid: vid || "" });
-    startTimers();
+    startTimers(FORGOT_PASSWORD_RESEND_KEY, FORGOT_PASSWORD_EXPIRY_KEY);
     setResendCountdown(RESEND_DURATION);
     setExpiryCountdown(EXPIRY_DURATION);
   };
 
   const onSubmit = async (data: OtpForgotPasswordFormData) => {
     await verifyOtpMutation({ vid: vid || "", code: data.otp_code });
-    clearTimers()
+    clearTimers(FORGOT_PASSWORD_RESEND_KEY, FORGOT_PASSWORD_EXPIRY_KEY)
     setStep("reset-password");
   };
 
