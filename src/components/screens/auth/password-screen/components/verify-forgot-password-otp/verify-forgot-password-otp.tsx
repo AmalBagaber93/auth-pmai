@@ -7,9 +7,10 @@ import { otpForgotPasswordFormSchema, type OtpForgotPasswordFormData } from "./s
 import { otpForgotPasswordDefaultValues } from "./schema/otp-default-values";
 import { OtpInputController } from "@/components/common/controllers/otp-input-controller";
 import Cookies from "js-cookie"
-import { ArrowLeft, Mail } from "lucide-react";
+import { ChevronLeft, Mail } from "lucide-react";
 import { useVerifyForgotPasswordOtpMutation } from "@/api/auth/hooks/mutations/use-verify-forgot-password-otp.mutation";
 import { useResendForgotPasswordOtpMutation } from "@/api/auth/hooks/mutations/use-resend-forgot-password-otp.mutation";
+import { motion, AnimatePresence } from "framer-motion";
 
 interface OtpVerifyForgotPasswordFormProps {
   setStep: (step: "email" | "otp" | "reset-password" | "success") => void;
@@ -19,6 +20,7 @@ export default function OtpVerifyForgotPasswordForm({
   setStep
 }: OtpVerifyForgotPasswordFormProps) {
   const [resendCountdown, setResendCountdown] = useState(60);
+  const [expiryCountdown, setExpiryCountdown] = useState(600);
 
   const methods = useForm<OtpForgotPasswordFormData>({
     resolver: zodResolver(otpForgotPasswordFormSchema()),
@@ -31,10 +33,7 @@ export default function OtpVerifyForgotPasswordForm({
   const email = Cookies.get('auth_email');
   const vid = Cookies.get('auth_vid');
 
-
-  const {
-    handleSubmit,
-  } = methods;
+  const { handleSubmit } = methods;
 
   useEffect(() => {
     if (resendCountdown <= 0) return;
@@ -42,68 +41,127 @@ export default function OtpVerifyForgotPasswordForm({
     return () => clearTimeout(t);
   }, [resendCountdown]);
 
+  useEffect(() => {
+    if (expiryCountdown <= 0) return;
+    const timer = setInterval(() => setExpiryCountdown((c) => c - 1), 1000);
+    return () => clearInterval(timer);
+  }, [expiryCountdown]);
+
+  const formatTime = (seconds: number) => {
+    const mins = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+    return `${mins.toString().padStart(2, "0")}:${secs.toString().padStart(2, "0")}`;
+  };
+
   const handleResend = async () => {
     if (resendCountdown > 0 || isResending) return;
-
-    await resendOtpMutation({ vid: vid || "" })
-
+    await resendOtpMutation({ vid: vid || "" });
     setResendCountdown(60);
-
+    setExpiryCountdown(600);
   };
 
   const onSubmit = async (data: OtpForgotPasswordFormData) => {
-
-    await verifyOtpMutation({ vid: vid || "", code: data.otp_code })
-    setStep("reset-password")
-    await new Promise((r) => setTimeout(r, 1400));
-
-
+    await verifyOtpMutation({ vid: vid || "", code: data.otp_code });
+    setStep("reset-password");
   };
 
   return (
     <FormProvider {...methods}>
-      <form onSubmit={handleSubmit(onSubmit)} >
-        <div className="animate-in fade-in slide-in-from-right-4 duration-500">
-          <button
-            type="button"
-            onClick={() => setStep("email")}
-            className="inline-flex items-center gap-2 text-sm text-[#f0f0ff]/40 hover:text-[#a78bfa] transition-colors mb-6"
-          >
-            <ArrowLeft className="w-4 h-4" /> Back
-          </button>
-          <div className="flex flex-col items-center text-center mb-8!">
-            <div className="w-16 h-16 mt-6! bg-[#a78bfa]/10 rounded-full flex items-center justify-center border border-[#a78bfa]/20">
-              <Mail className="w-8 h-8 text-[#a78bfa]" />
-            </div>
-            <h1 className="text-[26px] font-bold tracking-tight text-[#f0f0ff] mb-2">Check your email</h1>
-            <p className="text-sm text-[#f0f0ff]/50 leading-relaxed">
-              We sent a code to <span className="text-[#a78bfa] font-medium">{email || 'Your Email'}</span>
+      <form onSubmit={handleSubmit(onSubmit)}>
+        <motion.div
+          initial={{ opacity: 0, x: 20 }}
+          animate={{ opacity: 1, x: 0 }}
+          className="space-y-8"
+        >
+          <div className="flex flex-col items-start w-full">
+            <button
+              type="button"
+              onClick={() => setStep("email")}
+              className="inline-flex items-center gap-2 text-sm text-white/40 hover:text-white transition-colors group"
+            >
+              <ChevronLeft className="w-4 h-4 transition-transform group-hover:-translate-x-1" />
+              Back
+            </button>
+          </div>
+
+          <div className="flex flex-col items-center text-center gap-2">
+            <motion.div
+              initial={{ rotate: -10, scale: 0.5, opacity: 0 }}
+              animate={{ rotate: 0, scale: 1, opacity: 1 }}
+              transition={{ delay: 0.2, type: "spring", stiffness: 200, damping: 15 }}
+              className="w-16 h-16 rounded-3xl bg-indigo-500/10 flex items-center justify-center mb-2 border border-indigo-500/20 shadow-[0_0_40px_rgba(99,102,241,0.2)]"
+            >
+              <Mail className="w-8 h-8 text-indigo-400" />
+            </motion.div>
+            <h1 className="text-3xl font-bold tracking-tight text-white mb-2">Check Email</h1>
+            <p className="text-white/50 text-sm leading-relaxed">
+              We sent a code to <br />
+              <span className="text-indigo-400 font-semibold">{email || 'your email'}</span>
+            </p>
+
+            <AnimatePresence>
+              {resendCountdown === 60 && expiryCountdown === 600 && (
+                <motion.p
+                  initial={{ opacity: 0, y: -10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0 }}
+                  className="text-emerald-400 text-xs font-semibold mt-2 flex items-center gap-1.5"
+                >
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                  New OTP sent with fresh 10-minute expiry
+                </motion.p>
+              )}
+            </AnimatePresence>
+
+            <p className="text-white/50 text-[11px] font-bold mt-2 uppercase tracking-widest bg-white/5 px-3 py-1 rounded-full border border-white/5">
+              Code expires in: ⏱️ <span className="text-white font-mono">{formatTime(expiryCountdown)}</span>
             </p>
           </div>
 
-          <OtpInputController
-            name="otp_code"
-            maxLength={6}
-            disabled={isVerifying}
-          />
-          <div className="flex flex-col gap-4">
-            <button
-              type="submit"
+          <div className="space-y-10">
+            <OtpInputController
+              name="otp_code"
+              maxLength={6}
               disabled={isVerifying}
-              className="w-full h-13 mt-6! bg-linear-to-r from-[#6c63ff] via-[#8b5cf6] to-[#a78bfa] rounded-xl text-white font-semibold flex items-center justify-center transition-all hover:-translate-y-0.5 hover:shadow-[0_8px_36px_rgba(108,99,255,0.55)] active:translate-y-0 shadow-[0_4px_24px_rgba(108,99,255,0.35)]"
-            >
-              {isVerifying ? 'Verifying...' : 'Verify'}
-            </button>
-            <button
-              type="button"
-              onClick={handleResend}
-              disabled={resendCountdown > 0 || isResending}
-              className="ml-2 text-sm font-bold text-[#a78bfa] hover:text-[#c4b5fd] transition-colors disabled:opacity-50"
-            >
-              {resendCountdown > 0 ? `Resend in ${resendCountdown}s` : "Resend code"}
-            </button>
+            />
+
+            <div className="space-y-6">
+              <motion.button
+                whileHover={{ scale: 1.01, y: -1 }}
+                whileTap={{ scale: 0.99 }}
+                type="submit"
+                disabled={isVerifying || expiryCountdown === 0}
+                className="w-full h-13 bg-gradient-to-r from-indigo-600 to-indigo-500 rounded-2xl text-white font-bold text-sm flex items-center justify-center transition-all duration-300 shadow-[0_12px_24px_-8px_rgba(79,70,229,0.5)] hover:shadow-[0_20px_40px_-8px_rgba(79,70,229,0.7)] disabled:opacity-50 disabled:cursor-not-allowed uppercase tracking-wider"
+              >
+                {isVerifying ? (
+                  <span className="flex items-center gap-2">
+                    <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                    Verifying…
+                  </span>
+                ) : (
+                  "Verify Code"
+                )}
+              </motion.button>
+
+              <div className="text-center">
+                <button
+                  type="button"
+                  onClick={handleResend}
+                  disabled={resendCountdown > 0 || isResending}
+                  className="text-xs font-bold uppercase tracking-widest text-white/80 hover:text-indigo-400 transition-colors disabled:opacity-50 disabled:hover:text-white/30 disabled:cursor-not-allowed"
+                >
+                  {resendCountdown > 0 ? (
+                    `Resend in ${resendCountdown}s`
+                  ) : isResending ? (
+                    "Sending..."
+                  ) : (
+                    "Resend code"
+                  )}
+                </button>
+              </div>
+            </div>
           </div>
-        </div>
+        </motion.div>
       </form>
     </FormProvider>
   );

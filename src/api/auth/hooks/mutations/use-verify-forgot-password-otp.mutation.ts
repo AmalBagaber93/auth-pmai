@@ -21,6 +21,9 @@ export function useVerifyForgotPasswordOtpMutation() {
       toast.success(response.data.message || 'Otp verified successfully');
       Cookies.set('reset_token', response.data.reset_token)
 
+      Cookies.remove('auth_email')
+      Cookies.remove('auth_vid')
+
     },
     onError: (error: any) => {
       const data = JSON.parse(error.message);

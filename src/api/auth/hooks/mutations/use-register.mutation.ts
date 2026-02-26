@@ -17,7 +17,7 @@ export const useRegisterMutation = ({ setError }: UseRegisterMutationProps) => {
 
 
       Cookies.set('auth_email', variables.email)
-      Cookies.set('auth_vid', response.data.vid)
+      Cookies.set('auth_vid', response.data.vid, { expires: 1 / 24 })
 
       router.push('/otp-verify');
 

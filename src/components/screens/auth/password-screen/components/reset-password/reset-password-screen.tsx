@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, } from "react";
+import { useMemo } from "react";
 import { useForm, FormProvider } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Check } from "lucide-react";
@@ -11,13 +11,13 @@ import { resetPasswordDefaultValues } from "./schema/reset-password-default-valu
 import { useResetPasswordMutation } from "@/api/auth/hooks/mutations/use-reset-password.mutation";
 import Cookies from "js-cookie"
 import Link from "next/link";
+import { motion, AnimatePresence } from "framer-motion";
 
 interface ResetPasswordScreenProps {
   setStep: (step: "success" | "reset-password") => void;
 }
 
 export default function ResetPasswordScreen({ setStep }: ResetPasswordScreenProps) {
-
   const methods = useForm<ResetPasswordData>({
     resolver: zodResolver(resetPasswordSchema),
     defaultValues: resetPasswordDefaultValues as ResetPasswordData,
@@ -28,12 +28,11 @@ export default function ResetPasswordScreen({ setStep }: ResetPasswordScreenProp
   const { mutateAsync: resetPasswordMutation, isPending: isSubmitting } = useResetPasswordMutation(setError);
 
   const password = watch("password");
-
   const resetToken = Cookies.get('reset_token');
 
   const passwordChecks = useMemo(() => {
     return {
-      minLength: password?.length >= 8,
+      minLength: (password || '').length >= 8,
       hasNumber: /\d/.test(password || ""),
       hasSpecial: /[!@#$%^&*]/.test(password || ""),
       hasUppercase: /[A-Z]/.test(password || ""),
@@ -41,85 +40,111 @@ export default function ResetPasswordScreen({ setStep }: ResetPasswordScreenProp
   }, [password]);
 
   const onSubmit = async (data: ResetPasswordData) => {
-    await new Promise((r) => setTimeout(r, 1500));
-    await resetPasswordMutation({ password: data.password, password_confirmation: data.password_confirmation, reset_token: resetToken });
+    await resetPasswordMutation({
+      password: data.password,
+      password_confirmation: data.password_confirmation,
+      reset_token: resetToken || ""
+    });
     setStep("success");
   };
 
   return (
     <FormProvider {...methods}>
-      <form onSubmit={handleSubmit(onSubmit)} >
-        <div className="animate-in fade-in slide-in-from-right-4 duration-500">
-          <h1 className="text-[26px] font-bold tracking-tight text-[#f0f0ff] mb-2! text-center">Set new password</h1>
-          <p className="text-sm text-[#f0f0ff]/50 leading-relaxed mb-10! text-center">
-            Create a strong and secure password that you haven&apos;t used before.
-          </p>
+      <form onSubmit={handleSubmit(onSubmit)}>
+        <motion.div
+          initial={{ opacity: 0, x: 20 }}
+          animate={{ opacity: 1, x: 0 }}
+          className="space-y-8"
+        >
+          <div className="space-y-2 text-center">
+            <h1 className="text-3xl font-bold tracking-tight text-white">New Password</h1>
+            <p className="text-white/50 text-sm leading-relaxed">
+              Create a secure password you haven&apos;t used before.
+            </p>
+          </div>
 
-          <div className="space-y-6!">
-            <div className="space-y-2!">
+          <div className="!space-y-6">
+            <div className="space-y-3">
               <PasswordFieldController
                 name="password"
-                label="New password"
+                label="New Password"
                 placeholder="••••••••"
                 formItemClassName="mb-0"
               />
 
-              {password && (
-                <div className="border border-white/10 bg-white/3 !space-y-3 rounded-xl !p-2 backdrop-blur-sm animate-in zoom-in duration-300">
-                  <p className="text-[#f0f0ff] text-[10px] font-bold uppercase tracking-wider opacity-50">
-                    Password requirements
-                  </p>
-                  <ul className="!space-y-2">
-                    {[
-                      { key: 'minLength', label: '8+ characters', check: passwordChecks.minLength },
-                      { key: 'hasNumber', label: 'One number', check: passwordChecks.hasNumber },
-                      { key: 'hasSpecial', label: 'One special symbol', check: passwordChecks.hasSpecial },
-                      { key: 'hasUppercase', label: 'One uppercase letter', check: passwordChecks.hasUppercase },
-                    ].map((item) => (
-                      <li key={item.key} className="flex items-center gap-2.5 text-xs">
-                        <div className={cn(
-                          "h-4 w-4 rounded-full flex items-center justify-center border-2 transition-all duration-300",
-                          item.check ? "border-[#6c63ff] bg-[#6c63ff]" : "border-white/10"
-                        )}>
-                          {item.check && <Check className="w-2.5 h-2.5 text-white" />}
-                        </div>
-                        <span className={cn(item.check ? "text-[#f0f0ff]" : "text-[#f0f0ff]/40")}>
-                          {item.label}
-                        </span>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              )}
+              <AnimatePresence>
+                {password && (
+                  <motion.div
+                    initial={{ opacity: 0, height: 0 }}
+                    animate={{ opacity: 1, height: 'auto' }}
+                    exit={{ opacity: 0, height: 0 }}
+                    className="overflow-hidden"
+                  >
+                    <div className="bg-white/[0.03] rounded-2xl border border-white/5 p-4 !space-y-3">
+                      <p className="text-white/40 text-[10px] uppercase font-bold tracking-widest">
+                        Security Check
+                      </p>
+                      <div className="grid grid-cols-1 !gap-2">
+                        {[
+                          { key: 'minLength', label: '8+ Characters', check: passwordChecks.minLength },
+                          { key: 'hasNumber', label: 'One Number', check: passwordChecks.hasNumber },
+                          { key: 'hasSpecial', label: 'Special Character', check: passwordChecks.hasSpecial },
+                          { key: 'hasUppercase', label: 'Uppercase Letter', check: passwordChecks.hasUppercase },
+                        ].map((item) => (
+                          <div key={item.key} className="flex items-center gap-3">
+                            <div
+                              className={cn(
+                                "w-4 h-4 rounded-full border flex items-center justify-center transition-all duration-300",
+                                item.check
+                                  ? "bg-indigo-500 border-indigo-500 text-white"
+                                  : "border-white/20 bg-transparent"
+                              )}
+                            >
+                              {item.check && <Check className="w-2.5 h-2.5" />}
+                            </div>
+                            <span className={cn("text-xs transition-colors", item.check ? "text-white/90" : "text-white/30")}>
+                              {item.label}
+                            </span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
             </div>
 
             <PasswordFieldController
               name="password_confirmation"
-              label="Confirm password"
+              label="Confirm Password"
               placeholder="••••••••"
               formItemClassName="mb-0"
             />
 
-            <button
+            <motion.button
+              whileHover={{ scale: 1.01, y: -1 }}
+              whileTap={{ scale: 0.99 }}
               type="submit"
               disabled={isSubmitting}
-              className="w-full h-13 bg-linear-to-r from-[#6c63ff] via-[#8b5cf6] to-[#a78bfa] rounded-xl text-white font-semibold flex items-center justify-center transition-all hover:-translate-y-0.5 hover:shadow-[0_8px_36px_rgba(108,99,255,0.55)] active:translate-y-0 disabled:opacity-60"
+              className="w-full h-13 bg-gradient-to-r from-indigo-600 to-indigo-500 rounded-2xl text-white font-bold text-sm flex items-center justify-center transition-all duration-300 shadow-[0_12px_24px_-8px_rgba(79,70,229,0.5)] hover:shadow-[0_20px_40px_-8px_rgba(79,70,229,0.7)] disabled:opacity-50 disabled:cursor-not-allowed uppercase tracking-wider"
             >
               {isSubmitting ? (
                 <span className="flex items-center gap-2">
-                  <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                  Resetting...
+                  <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                  Updating…
                 </span>
-              ) : "Reset password"}
-            </button>
-            <p className="text-center mt-8! text-sm text-[#f0f0ff]/50">
-              go to
-              <Link href="/login" className="text-[#a78bfa] font-bold ml-1.5! hover:text-[#c4b5fd] transition-colors no-underline">
-                Sign In
+              ) : (
+                "Reset Password"
+              )}
+            </motion.button>
+
+            <div className="text-center">
+              <Link href="/login" className="text-xs font-bold uppercase tracking-widest text-white/30 hover:text-indigo-400 transition-colors">
+                Back to Sign in
               </Link>
-            </p>
+            </div>
           </div>
-        </div>
+        </motion.div>
       </form>
     </FormProvider>
   );

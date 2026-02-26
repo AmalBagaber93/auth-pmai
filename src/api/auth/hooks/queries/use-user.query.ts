@@ -1,19 +1,18 @@
 'use client';
 
 import { useQuery } from '@tanstack/react-query';
-import { getUser, type IGetUserResponse } from '../../client/get-user';
+import { user, type IUserResponse } from '../../client/user';
 
-interface UseUserQueryOptions {
-  initialData?: IGetUserResponse | null;
+interface UseUserQueryProps {
+  initialData?: IUserResponse | null;
 }
 
-export function useUserQuery(options?: UseUserQueryOptions) {
+export function useUserQuery(options?: UseUserQueryProps) {
   const { initialData } = options || {};
 
   return useQuery({
     queryKey: ['user'],
-    queryFn: getUser,
+    queryFn: user,
     initialData: initialData ?? undefined,
-    staleTime: 5 * 60 * 1000, // 5 minutes
   });
 }

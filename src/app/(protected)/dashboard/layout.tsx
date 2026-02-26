@@ -9,7 +9,9 @@ export default async function Layout({ children }: { children: React.ReactNode }
 
   if (!userDetailsData) {
     redirect('/login');
+    console.log('user not found');
   }
+  console.log('user found');
   return <DashboardLayout>{children}</DashboardLayout>;
 }
 

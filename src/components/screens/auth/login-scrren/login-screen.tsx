@@ -12,101 +12,99 @@ import { Form } from "@/components/ui/form";
 import { Background } from "@/components/common/background";
 import { useLoginMutation } from "@/api/auth/hooks/mutations/use-login.mutation";
 import { useRecoverVerification } from "@/api/auth/hooks/mutations/use-recover-verification.mutation";
-
+import { motion, AnimatePresence } from "framer-motion";
+import AuthCard from "../components/auth-card";
 
 export default function LoginScreen() {
-
   const methods = useForm<LoginFormData>({
     resolver: zodResolver(loginFormSchema()),
     defaultValues: loginDefaultValues,
   });
 
-
-  const {
-    handleSubmit,
-    setError
-  } = methods;
-
-  const { mutate: verifyEmailMutate } = useRecoverVerification()
+  const { handleSubmit, setError } = methods;
+  const { mutate: verifyEmailMutate } = useRecoverVerification();
 
   const onVerifyEmail = () => {
-    verifyEmailMutate({ email: methods.getValues("email") })
-  }
+    verifyEmailMutate({ email: methods.getValues("email") });
+  };
   const { mutate: loginMutate, isPending } = useLoginMutation(setError, onVerifyEmail);
 
   const onSubmit = (data: LoginFormData) => {
-    loginMutate({ ...data, remember_me: data.remember_me ?? false })
-
+    loginMutate({ ...data, remember_me: data.remember_me ?? false });
   };
 
-
-
   return (
-    <div className="relative min-h-screen flex items-center justify-center p-6 bg-[#0a0a1a] overflow-hidden">
-      <Background />
+        <AuthCard>
+          <div className="flex flex-col items-center gap-2 mb-10 text-center">
+            <h1 className="text-3xl font-bold tracking-tight text-white mb-2">Welcome Back</h1>
+            <p className="text-white/50 text-sm leading-relaxed">Enter your credentials to access your account</p>
+          </div>
 
-      <main className="relative z-10 w-full max-w-110 bg-white/4 backdrop-blur-xl border border-white/10 rounded-3xl p-8! md:p-12! shadow-[0_32px_80px_rgba(0,0,0,0.5)] animate-in fade-in slide-in-from-bottom-8 duration-700">
-        <div className="flex flex-col items-center gap-4 mb-10 text-center">
-          <span className="text-[22px] font-bold tracking-tight bg-linear-to-br from-[#f0f0ff] to-[#a78bfa] bg-clip-text text-transparent">PMAI</span>
-        </div>
+          <Form {...methods}>
+            <form onSubmit={handleSubmit(onSubmit)} noValidate aria-label="Login form" className="space-y-6 w-full">
+              <div className="!space-y-5">
+                <InputController
+                  name="email"
+                  label="Email address"
+                  autoComplete="email"
+                  placeholder="name@company.com"
+                  formItemClassName="mb-0"
+                />
 
-        <h1 className="text-[26px] font-bold tracking-tight text-[#f0f0ff] text-center mb-2">Welcome back</h1>
-        <p className="text-sm text-[#f0f0ff]/50 text-center mb-10 leading-relaxed">Sign in to your account to continue</p>
-
-
-        <Form {...methods}>
-          <form onSubmit={handleSubmit(onSubmit)} noValidate aria-label="Login form">
-            <div className="space-y-6! mt-4!">
-              <InputController
-                name="email"
-                label="Email address"
-                autoComplete="email"
-                placeholder="you@company.com"
-                formItemClassName="mb-0"
-              />
-
-              <PasswordFieldController
-                name="password"
-                label="Password"
-                placeholder="••••••••"
-                autoComplete="current-password"
-                formItemClassName="mb-0"
-              />
+                <PasswordFieldController
+                  name="password"
+                  label="Password"
+                  placeholder="••••••••"
+                  autoComplete="current-password"
+                  formItemClassName="mb-0"
+                />
+              </div>
 
               <div className="flex items-center justify-between">
                 <CheckboxFieldController
                   name="remember_me"
-                  label={<span className="text-xs text-[#f0f0ff]/60">Remember me</span>}
+                  label={<span className="text-xs text-white/50">Remember me</span>}
                 />
-                <Link href="/forgot-password" id="forgot-password-link" className="text-xs text-[#a78bfa] font-medium hover:text-[#c4b5fd] transition-colors no-underline">
+                <Link
+                  href="/forgot-password"
+                  className="text-xs text-indigo-400 font-semibold hover:text-indigo-300 transition-colors"
+                >
                   Forgot password?
                 </Link>
               </div>
 
-              <button
+              <motion.button
+                whileHover={{ scale: 1.01, y: -1 }}
+                whileTap={{ scale: 0.99 }}
                 type="submit"
                 id="login-submit-btn"
                 disabled={isPending}
-                className="w-full h-13 bg-linear-to-r from-[#6c63ff] via-[#8b5cf6] to-[#a78bfa] rounded-xl text-white font-semibold flex items-center justify-center transition-all duration-300 hover:-translate-y-0.5 hover:shadow-[0_8px_36px_rgba(108,99,255,0.55)] active:translate-y-0 disabled:opacity-60 disabled:cursor-not-allowed shadow-[0_4px_24px_rgba(108,99,255,0.35)]"
+                className="w-full h-13 bg-gradient-to-r from-indigo-600 to-indigo-500 rounded-2xl text-white font-bold text-sm flex items-center justify-center transition-all duration-300 shadow-[0_12px_24px_-8px_rgba(79,70,229,0.5)] hover:shadow-[0_20px_40px_-8px_rgba(79,70,229,0.7)] disabled:opacity-50 disabled:cursor-not-allowed uppercase tracking-wider"
               >
                 {isPending ? (
                   <span className="flex items-center gap-2">
-                    <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                    Signing in…
+                    <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                    Authenticating…
                   </span>
-                ) : "Sign in"}
-              </button>
-            </div>
-          </form>
-        </Form>
+                ) : (
+                  "Sign In"
+                )}
+              </motion.button>
+            </form>
+          </Form>
 
-        <p className="text-center mt-8! text-sm text-[#f0f0ff]/50">
-          Don&apos;t have an account?
-          <Link href="/register" className="text-[#a78bfa] font-bold ml-1.5! hover:text-[#c4b5fd] transition-colors no-underline">
-            Create one
-          </Link>
-        </p>
-      </main>
-    </div>
+          <div className="mt-10 text-center">
+            <p className="text-white/40 text-sm">
+              Don&apos;t have an account?
+              <Link
+                href="/register"
+                className="text-white font-semibold ml-2 hover:text-indigo-300 transition-colors underline-offset-4 hover:underline"
+              >
+                Create one now
+              </Link>
+            </p>
+          </div>
+        </AuthCard>
+
   );
 }

@@ -1,8 +1,8 @@
 import { cookies } from 'next/headers';
-import type { IGetUserResponse } from '../client/get-user';
+import type { IUserResponse } from '../client/user';
 import { apiServer } from '@/utils/fetch/api-server';
 
-export async function getUserServer(): Promise<IGetUserResponse | null> {
+export async function getUserServer(): Promise<IUserResponse | null> {
   const cookieStore = await cookies();
 
   const token = cookieStore.get('token')?.value;
@@ -12,7 +12,7 @@ export async function getUserServer(): Promise<IGetUserResponse | null> {
   }
 
   try {
-    return await apiServer.get('user/me').json<IGetUserResponse>();
+    return await apiServer.get('user/me').json<IUserResponse>();
   } catch (error) {
     console.error('getUserServer error:', error);
     return null;

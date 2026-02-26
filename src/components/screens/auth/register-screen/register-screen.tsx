@@ -1,10 +1,11 @@
 "use client";
+
 import { zodResolver } from "@hookform/resolvers/zod";
 import Link from "next/link";
 import { FormProvider, useForm } from "react-hook-form";
 import { RegisterFormData, registerFormSchema } from "./schema/register-form-schema";
 import { registerDefaultValues } from "./schema/register-default-values";
-import { useMemo, } from "react";
+import { useMemo } from "react";
 import { InputController } from "@/components/common/controllers/input-controller";
 import { PasswordFieldController } from "@/components/common/controllers/password-field-controller";
 import { Check } from "lucide-react";
@@ -12,9 +13,10 @@ import { CheckboxFieldController } from "@/components/common/controllers/checkbo
 import { cn } from "@/utils/utils";
 import { Background } from "@/components/common/background";
 import { useRegisterMutation } from "@/api/auth/hooks/mutations/use-register.mutation";
+import { motion, AnimatePresence } from "framer-motion";
+import AuthCard from "../components/auth-card";
 
 export default function RegisterScreen() {
-
   const method = useForm<RegisterFormData>({
     resolver: zodResolver(registerFormSchema()),
     defaultValues: registerDefaultValues,
@@ -27,7 +29,7 @@ export default function RegisterScreen() {
 
   const passwordChecks = useMemo(() => {
     return {
-      minLength: password?.length >= 8,
+      minLength: (password || '').length >= 8,
       hasNumber: /\d/.test(password || ''),
       hasSpecial: /[!@#$%^&*]/.test(password || ''),
       hasUppercase: /[A-Z]/.test(password || ''),
@@ -39,105 +41,119 @@ export default function RegisterScreen() {
   };
 
   return (
-    <div className="relative min-h-screen flex items-center justify-center p-6! overflow-x-hidden bg-[#0a0a1a]">
-      <Background />
+<AuthCard>
+          <div className="flex flex-col items-center gap-2 mb-4 text-center">
+            <h1 className="text-3xl font-bold tracking-tight text-white mb-2">Create Account</h1>
+            <p className="text-white/50 text-sm leading-relaxed">Join us today and experience the future</p>
+          </div>
 
-      <main className="relative z-10 w-full max-w-125 bg-white/4 backdrop-blur-xl border border-white/10 rounded-3xl p-8!  shadow-[0_32px_80px_rgba(0,0,0,0.5)] animate-in fade-in slide-in-from-bottom-8 duration-700">
-        <div className="flex flex-col items-center gap-4 mb-10 text-center">
-
-          <span className="text-[22px] font-bold tracking-tight bg-linear-to-br from-[#f0f0ff] to-[#a78bfa] bg-clip-text text-transparent">PMAI</span>
-        </div>
-
-        <h1 className="text-[26px] font-bold tracking-tight text-[#f0f0ff] text-center my-6">Create your account</h1>
-
-        <FormProvider {...method}>
-          <form onSubmit={method.handleSubmit(handleSubmit)} noValidate aria-label="Sign up form">
-            <div className="space-y-6!">
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <InputController name="first_name" placeholder="First name" formItemClassName="mb-0" />
-                <InputController name="last_name" placeholder="Last name" formItemClassName="mb-0" />
+          <FormProvider {...method}>
+            <form onSubmit={method.handleSubmit(handleSubmit)} noValidate aria-label="Sign up form" className="!space-y-6">
+              <div className="grid grid-cols-2 gap-4">
+                <InputController name="first_name" label="First Name" placeholder="First Name" formItemClassName="mb-0" />
+                <InputController name="last_name" label="Last Name" placeholder="Last Name" formItemClassName="mb-0" />
               </div>
 
-              <InputController name="email" placeholder="Email address" formItemClassName="mb-0" />
+              <InputController name="email" label="Email" placeholder="Email" formItemClassName="mb-0" />
 
-              <div className='space-y-2!'>
+              <div className="!space-y-3">
                 <PasswordFieldController
-                  name='password'
-                  placeholder="Password"
+                  name="password"
+                  label="Password"
+                  placeholder="••••••••"
                   formItemClassName="mb-0"
                 />
 
-                {password && (
-                  <div className='border-white/10 bg-white/3 space-y-3! rounded-xl border p-4! backdrop-blur-sm animate-in fade-in slide-in-from-top-2 duration-300'>
-                    <p className='text-[#f0f0ff] text-xs font-semibold uppercase tracking-wider opacity-70'>
-                      Password requirements
-                    </p>
-                    <ul className='space-y-2.5!'>
-                      {[
-                        { key: 'minLength', label: 'At least 8 characters', check: passwordChecks.minLength },
-                        { key: 'hasNumber', label: 'At least one number', check: passwordChecks.hasNumber },
-                        { key: 'hasSpecial', label: 'At least one special character', check: passwordChecks.hasSpecial },
-                        { key: 'hasUppercase', label: 'At least one uppercase letter', check: passwordChecks.hasUppercase },
-                      ].map((item) => (
-                        <li key={item.key} className="text-[#f0f0ff]/60 flex items-center gap-3 text-xs">
-                          <div
-                            className={cn(
-                              "flex h-4 w-4 shrink-0 items-center justify-center rounded-full border-2 transition-all duration-300",
-                              item.check
-                                ? "border-[#6c63ff] bg-[#6c63ff] text-white shadow-[0_0_12px_rgba(108,99,255,0.4)]"
-                                : "border-white/20 bg-transparent"
-                            )}
-                          >
-                            {item.check && <Check className='h-2.5 w-2.5' />}
-                          </div>
-                          <span className={cn("transition-colors duration-300", item.check && "text-[#f0f0ff] font-medium")}>
-                            {item.label}
-                          </span>
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                )}
+                <AnimatePresence>
+                  {password && (
+                    <motion.div
+                      initial={{ opacity: 0, height: 0 }}
+                      animate={{ opacity: 1, height: 'auto' }}
+                      exit={{ opacity: 0, height: 0 }}
+                      className="overflow-hidden"
+                    >
+                      <div className="bg-white/[0.03] rounded-2xl border border-white/5 p-4 space-y-3">
+                        <p className="text-white/40 text-[10px] uppercase font-bold tracking-widest">
+                          Password Security
+                        </p>
+                        <div className="grid grid-cols-1 gap-2">
+                          {[
+                            { key: 'minLength', label: '8+ Characters', check: passwordChecks.minLength },
+                            { key: 'hasNumber', label: 'One Number', check: passwordChecks.hasNumber },
+                            { key: 'hasSpecial', label: 'Special Character', check: passwordChecks.hasSpecial },
+                            { key: 'hasUppercase', label: 'Uppercase Letter', check: passwordChecks.hasUppercase },
+                          ].map((item) => (
+                            <div key={item.key} className="flex items-center gap-3">
+                              <div
+                                className={cn(
+                                  "w-4 h-4 rounded-full border flex items-center justify-center transition-all duration-300",
+                                  item.check
+                                    ? "bg-indigo-500 border-indigo-500 text-white"
+                                    : "border-white/20 bg-transparent"
+                                )}
+                              >
+                                {item.check && <Check className="w-2.5 h-2.5" />}
+                              </div>
+                              <span className={cn("text-xs transition-colors", item.check ? "text-white/90" : "text-white/30")}>
+                                {item.label}
+                              </span>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
               </div>
 
               <PasswordFieldController
-                name='password_confirmation'
-                autoComplete='new-password'
-                placeholder="Confirm password"
+                name="password_confirmation"
+                label="Confirm Password"
+                placeholder="••••••••"
                 formItemClassName="mb-0"
               />
 
-
               <CheckboxFieldController
                 name="terms_accepted"
-                label={<span className="text-sm text-[#f0f0ff]/50 leading-relaxed">I agree to the <a href="#" className="text-[#a78bfa] font-medium hover:text-[#c4b5fd] transition-colors">Terms of Service</a> </span>}
+                label={
+                  <span className="text-xs text-white/50 leading-relaxed">
+                    I agree to the <a href="#" className="text-indigo-400 hover:text-indigo-300 transition-colors underline underline-offset-2">Terms of Service</a>
+                  </span>
+                }
               />
 
-              <button
+              <motion.button
+                whileHover={{ scale: 1.01, y: -1 }}
+                whileTap={{ scale: 0.99 }}
                 type="submit"
                 id="signup-submit-btn"
                 disabled={method.formState.isSubmitting}
-                className="w-full h-13 bg-linear-to-r from-[#6c63ff] via-[#8b5cf6] to-[#a78bfa] rounded-xl text-white font-semibold flex items-center justify-center transition-all duration-300 hover:-translate-y-0.5 hover:shadow-[0_8px_36px_rgba(108,99,255,0.55)] active:translate-y-0 disabled:opacity-60 disabled:cursor-not-allowed shadow-[0_4px_24px_rgba(108,99,255,0.35)] mt-4"
+                className="w-full h-13 bg-gradient-to-r from-indigo-600 to-indigo-500 rounded-2xl text-white font-bold text-sm flex items-center justify-center transition-all duration-300 shadow-[0_12px_24px_-8px_rgba(79,70,229,0.5)] hover:shadow-[0_20px_40px_-8px_rgba(79,70,229,0.7)] disabled:opacity-50 disabled:cursor-not-allowed uppercase tracking-wider"
               >
                 {method.formState.isSubmitting ? (
                   <span className="flex items-center gap-2">
-                    <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                    <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
                     Creating account...
                   </span>
-                ) : "Create account"}
-              </button>
-            </div>
-          </form>
-        </FormProvider>
+                ) : (
+                  "Create account"
+                )}
+              </motion.button>
+            </form>
+          </FormProvider>
 
+          <div className="mt-6 text-center">
+            <p className="text-white/40 text-sm">
+              Already have an account?
+              <Link
+                href="/login"
+                className="text-white font-semibold ml-2 hover:text-indigo-300 transition-colors underline-offset-4 hover:underline"
+              >
+                Sign in
+              </Link>
+            </p>
+          </div>
 
-        <p className="text-center mt-8! text-sm text-[#f0f0ff]/50">
-          Already have an account?
-          <Link href="/login" className="text-[#a78bfa] font-bold ml-1.5 hover:text-[#c4b5fd] transition-colors no-underline">
-            Sign in
-          </Link>
-        </p>
-      </main>
-    </div>
+    </AuthCard>
   );
 }

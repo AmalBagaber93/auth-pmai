@@ -40,6 +40,7 @@ export function OtpInputController<TFormValues extends FieldValues>({
                     <FormControl>
                         <InputOTP
                             id={id}
+                            type='number'
                             maxLength={maxLength}
                             disabled={disabled}
                             value={field.value}

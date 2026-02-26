@@ -1,11 +1,12 @@
 import { InputController } from "@/components/common/controllers/input-controller";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { ArrowLeft } from "lucide-react";
+import { ChevronLeft } from "lucide-react";
 import { FormProvider, useForm } from "react-hook-form";
 import { ForgotPasswordData, forgotPasswordSchema } from "./schema/forgot-password-schema";
 import { forgotPasswordDefaultValues } from "./schema/forgot-password-default-values";
 import { useForgotPasswordMutation } from "@/api/auth/hooks/mutations/use-forgot-password.mutation";
 import { useRouter } from "next/navigation";
+import { motion } from "framer-motion";
 
 interface ForgotPasswordProps {
   setStep: (step: "email" | "otp" | "reset-password" | "success") => void;
@@ -13,6 +14,7 @@ interface ForgotPasswordProps {
 
 export default function ForgotPassword({ setStep }: ForgotPasswordProps) {
   const router = useRouter();
+
   const methods = useForm<ForgotPasswordData>({
     resolver: zodResolver(forgotPasswordSchema()),
     defaultValues: forgotPasswordDefaultValues,
@@ -28,34 +30,54 @@ export default function ForgotPassword({ setStep }: ForgotPasswordProps) {
 
   return (
     <FormProvider {...methods}>
-      <form onSubmit={handleSubmit(onSubmit)} >
-        <div className="animate-in fade-in slide-in-from-right-4 duration-500 space-y-4!">
+      <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-6 w-full max-w-md mx-auto">
+        <motion.div
+          initial={{ opacity: 0, x: 20 }}
+          animate={{ opacity: 1, x: 0 }}
+          className="flex flex-col gap-6 w-full"
+        >
           <button
             type="button"
             onClick={() => router.push("/login")}
-            className="inline-flex items-center gap-2 text-sm text-[#f0f0ff]/40 hover:text-[#a78bfa] transition-colors mb-6"
+            className="inline-flex items-center gap-2 text-sm text-white/40 hover:text-white transition-colors self-start"
           >
-            <ArrowLeft className="w-4 h-4" /> Back to Sign in
+            <ChevronLeft className="w-4 h-4 flex-shrink-0 transition-transform group-hover:-translate-x-1" />
+            <span>Back to Sign in</span>
           </button>
-          <h1 className="text-[26px] font-bold tracking-tight text-[#f0f0ff] mb-2">Forgot password?</h1>
-          <p className="text-sm text-[#f0f0ff]/50 leading-relaxed mb-10">
-            Enter your email address and we&apos;ll send you a 6-digit verification code.
-          </p>
-          <div className="space-y-6">
+
+          <div className="space-y-2 text-left">
+            <h1 className="text-3xl font-bold tracking-tight text-white">Forgot Password?</h1>
+            <p className="text-white/50 text-sm leading-relaxed">
+              Enter your email address and we&apos;ll send you a 6-digit verification code.
+            </p>
+          </div>
+
+          <div className="flex flex-col gap-8">
             <InputController
               name="email"
-              label="Email"
-              placeholder="you@company.com"
+              label="Email Address"
+              placeholder="name@company.com"
               formItemClassName="mb-0"
             />
-            <button
+
+            <motion.button
+              whileHover={{ scale: 1.01, y: -1 }}
+              whileTap={{ scale: 0.99 }}
               type="submit"
-              className="w-full h-13 mt-6! bg-linear-to-r from-[#6c63ff] via-[#8b5cf6] to-[#a78bfa] rounded-xl text-white font-semibold flex items-center justify-center transition-all hover:-translate-y-0.5 hover:shadow-[0_8px_36px_rgba(108,99,255,0.55)] active:translate-y-0 shadow-[0_4px_24px_rgba(108,99,255,0.35)]"
+              disabled={isPending}
+              className="w-full h-13 bg-gradient-to-r from-indigo-600 to-indigo-500 rounded-2xl text-white font-bold text-sm flex items-center justify-center transition-all duration-300 shadow-[0_12px_24px_-8px_rgba(79,70,229,0.5)] hover:shadow-[0_20px_40px_-8px_rgba(79,70,229,0.7)] disabled:opacity-50 disabled:cursor-not-allowed uppercase tracking-wider"
             >
-              {isPending ? "Sending" : "Send reset code"}
-            </button>
+              {isPending ? (
+                <span className="flex items-center gap-2">
+                  <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                  Sending…
+                </span>
+              ) : (
+                "Send reset code"
+              )}
+            </motion.button>
           </div>
-        </div>
+        </motion.div>
       </form>
     </FormProvider>
   );

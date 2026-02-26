@@ -11,10 +11,10 @@ export interface IUser {
   email_verified_at: string | null;
 }
 
-export interface IGetUserResponse {
+export interface IUserResponse {
   data: IUser;
 }
 
-export async function getUser(): Promise<IGetUserResponse> {
-  return apiClient.get('user/me').json<IGetUserResponse>();
+export async function user(): Promise<IUserResponse> {
+  return apiClient.get('user/me').json<IUserResponse>();
 }

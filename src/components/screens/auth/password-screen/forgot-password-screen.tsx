@@ -8,10 +8,12 @@ import ForgotPassword from "./components/forgot-password-form/forgot-password-fo
 import OtpVerifyForgotPasswordForm from "./components/verify-forgot-password-otp/verify-forgot-password-otp";
 import EmailSenSuccess from "./components/email-send-success";
 import ResetPasswordScreen from "./components/reset-password/reset-password-screen";
+import { motion, AnimatePresence } from "framer-motion";
+import AuthCard from "../components/auth-card";
 
 type Step = "email" | "otp" | "reset-password" | "success";
 
-function ForgotPasswordContent() {
+export default function ForgotPasswordScreen() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const stepFromQuery = searchParams.get("step") as Step;
@@ -31,53 +33,46 @@ function ForgotPasswordContent() {
     router.push(`?${params.toString()}`);
   };
 
+  const steps: Step[] = ["email", "otp", "reset-password"];
+
   return (
-    <div className="relative min-h-screen flex items-center justify-center p-6! bg-[#0a0a1a] overflow-hidden">
-      <Background />
-      <main className="relative z-10 w-full max-w-110 bg-white/4 backdrop-blur-xl border border-white/10 rounded-3xl p-8! md:p-12! shadow-[0_32px_80px_rgba(0,0,0,0.5)] animate-in fade-in slide-in-from-bottom-8 duration-700">
-        <div className="flex flex-col items-center gap-4 mb-10 text-center">
-          <span className="text-[22px] font-bold tracking-tight bg-linear-to-br from-[#f0f0ff] to-[#a78bfa] bg-clip-text text-transparent">PMAI</span>
-        </div>
+<AuthCard>
 
-        {step !== "success" && (
-          <div className="flex justify-center mb-8 gap-2">
-            {(["email", "otp", "reset-password"] as const).map((s, i) => (
-              <div
-                key={s}
-                className={cn(
-                  "h-1.5 rounded-full transition-all duration-500",
-                  step === s ? "w-8 bg-[#6c63ff]" : i < ["email", "otp", "reset-password"].indexOf(step) ? "w-6 bg-[#4ade80]" : "w-1.5 bg-white/10"
-                )}
-              />
-            ))}
-          </div>
-        )}
+          {step !== "success" && (
+            <div className="flex justify-center mb-10 gap-3">
+              {steps.map((s, i) => {
+                const isActive = step === s;
+                const isCompleted = steps.indexOf(step) > i;
+                return (
+                  <div
+                    key={s}
+                    className={cn(
+                      "h-1.5 rounded-full transition-all duration-500",
+                      isActive ? "w-10 bg-indigo-500" : isCompleted ? "w-6 bg-emerald-500" : "w-1.5 bg-white/10"
+                    )}
+                  />
+                );
+              })}
+            </div>
+          )}
 
-        {step === "email" && (
-          <ForgotPassword setStep={handleSetStep} />
-        )}
-
-        {step === "otp" && (
-          <OtpVerifyForgotPasswordForm setStep={handleSetStep} />
-        )}
-
-        {step === "reset-password" && (
-          <ResetPasswordScreen setStep={handleSetStep} />
-        )}
-
-        {step === "success" && (
-          <EmailSenSuccess setStep={handleSetStep} />
-        )}
-
-      </main>
-    </div>
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={step}
+              initial={{ opacity: 0, x: 10 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: -10 }}
+              transition={{ duration: 0.3 }}
+            >
+              {step === "email" && <ForgotPassword setStep={handleSetStep} />}
+              {step === "otp" && <OtpVerifyForgotPasswordForm setStep={handleSetStep} />}
+              {step === "reset-password" && <ResetPasswordScreen setStep={handleSetStep} />}
+              {step === "success" && <EmailSenSuccess setStep={handleSetStep} />}
+            </motion.div>
+          </AnimatePresence>
+</AuthCard>
+  
   );
 }
 
-export default function ForgotPasswordScreen() {
-  return (
-    <Suspense fallback={<div className="min-h-screen bg-[#0a0a1a]" />}>
-      <ForgotPasswordContent />
-    </Suspense>
-  );
-}
+

@@ -19,24 +19,34 @@
 }
 
 :root {
-  --background: #0a0a1a;
-  --foreground: #f0f0ff;
-  --accent: #6c63ff;
-  --accent-light: #a78bfa;
-  --accent-glow: rgba(108, 99, 255, 0.4);
-  --surface: rgba(255, 255, 255, 0.04);
-  --surface-hover: rgba(255, 255, 255, 0.08);
-  --border: rgba(255, 255, 255, 0.1);
-  --border-focus: rgba(108, 99, 255, 0.6);
-  --text-muted: rgba(240, 240, 255, 0.5);
-  --error: #ff4d6d;
-  --success: #4ade80;
+  --background: #03030b;
+  --foreground: #f8fafc;
+  
+  --accent: #6366f1;
+  --accent-light: #818cf8;
+  --accent-dark: #4f46e5;
+  --accent-glow: rgba(99, 102, 241, 0.35);
+  
+  --surface: rgba(15, 23, 42, 0.6);
+  --surface-hover: rgba(30, 41, 59, 0.8);
+  --glass: rgba(255, 255, 255, 0.03);
+  --glass-hover: rgba(255, 255, 255, 0.06);
+  --glass-border: rgba(255, 255, 255, 0.1);
+  
+  --border: rgba(255, 255, 255, 0.08);
+  --border-focus: rgba(99, 102, 241, 0.5);
+  
+  --text-muted: #94a3b8;
+  --text-dim: #64748b;
+  
+  --error: #f43f5e;
+  --success: #10b981;
+  --warning: #f59e0b;
 }
 
 * {
   box-sizing: border-box;
-  margin: 0;
-  padding: 0;
+
 }
 
 body {
@@ -78,4 +88,8 @@ body {
   80% {
     transform: translateX(4px);
   }
+}
+input[type=number]::-webkit-outer-spin-button,
+input[type=number]::-webkit-inner-spin-button {
+  -webkit-appearance: none;
 }
